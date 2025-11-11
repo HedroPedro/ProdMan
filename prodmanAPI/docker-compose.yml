@@ -1,0 +1,29 @@
+services:
+  web:
+    build: .
+    command: rails server -b 0.0.0.0
+    volumes:
+      - .:/app
+    ports:
+      - "8080:3000"
+    depends_on:
+      - db
+    environment:
+      DATABASE_HOST: db
+      DATABASE_USER: prodman_user
+      DATABASE_PASSWORD: prodman_password
+      DATABASE_NAME: prodman_api_development
+  
+  db:
+    image: mysql:9.5.0
+    
+    environment:
+      MYSQL_USER: prodman_user
+      MYSQL_PASSWORD: prodman_password
+      MYSQL_DATABASE: prodman_api_development
+      MYSQL_ROOT_PASSWORD: prodman_password
+    volumes:
+      - db_data:/var/lib/mysql
+
+volumes:
+  db_data:
