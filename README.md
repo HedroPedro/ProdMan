@@ -100,10 +100,10 @@ All protected routes require an `Authorization: Bearer <token>` header, which is
 | Method | Endpoint | Description |
 | :--- | :--- | :--- |
 | `GET` | `/users` | Lists all active (not-deleted) users. |
-| `GET` | `/users/:id` | Gets a single user by ID. |
-| `PATCH`| `/users/:id` | Updates a user's details (e.g., name, password). |
-| `DELETE`| `/users/:id` | **Soft deletes** a user (sets `deleted_at`). |
-| `PATCH` | `/users/:id/restore`| Restores a soft-deleted user (sets `deleted_at` to `null`). |
+| `GET` | `/users/{id}` | Gets a single user by ID. |
+| `PATCH`| `/users/{id}` | Updates a user's details (e.g., name, password). |
+| `DELETE`| `/users/{id}` | **Soft deletes** a user (sets `deleted_at`). |
+| `PATCH` | `/users/{id}/restore`| Restores a soft-deleted user (sets `deleted_at` to `null`). |
 
 #### Products (Protected)
 
@@ -111,7 +111,7 @@ All protected routes require an `Authorization: Bearer <token>` header, which is
 | :--- | :--- | :--- |
 | `GET` | `/products` | Lists all active (not-deleted) products. |
 | `POST` | `/products` | Creates a new product. |
-| `GET` | `/products/:id` | Gets a single product by ID. |
-| `PATCH`| `/products/:id` | Updates a product's details. |
-| `DELETE`| `/products/:id` | **Soft deletes** a product (sets `deleted_at`). |
-| `PATCH` | `/products/:id/restore`| Restores a soft-deleted product (sets `deleted_at` to `null`). |
+| `GET` | `/products/{id}` | Gets a single product by ID. |
+| `PATCH`| `/products/{id}` | Updates a product's details. |
+| `DELETE`| `/products/{id}` | **Soft deletes** a product (sets `deleted_at`). |
+| `PATCH` | `/products/{id}/restore`| Restores a soft-deleted product (sets `deleted_at` to `null`). |
