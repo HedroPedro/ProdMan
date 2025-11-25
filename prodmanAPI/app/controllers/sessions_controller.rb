@@ -1,7 +1,7 @@
 class SessionsController < ApplicationController
   allow_unauthenticated_access only: :create
   rate_limit to: 10, within: 3.minutes, only: :create, 
-    with: -> { render json: { error: "Try again later." }, status: :too_many_requests }
+    with: -> { render json: { error: "Tente novamente mais tarde." }, status: :too_many_requests }
 
   # POST /auth/login
   def create
@@ -12,7 +12,7 @@ class SessionsController < ApplicationController
       token = JsonWebToken.encode(payload)
       render json: { token: token, user: @user}, status: :created
     else
-      render json: {error: "Invalid email or password"}, status: :unauthorized
+      render json: {error: "Email ou senha inválidos"}, status: :unauthorized
     end
   end
 
@@ -20,7 +20,7 @@ class SessionsController < ApplicationController
     if current_user
       head :no_content
     else
-      render json: {error: "No user to log out"}, status: :unauthorized
+      render json: {error: "Nenhum usuário para fazer logout"}, status: :unauthorized
     end
   end
 

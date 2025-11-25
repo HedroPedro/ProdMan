@@ -1,0 +1,81 @@
+<div class="login-container">
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title>{{ isLoginMode ? 'Login' : 'Registro' }}</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <form [formGroup]="isLoginMode ? loginForm : registerForm" (ngSubmit)="onSubmit()">
+        <mat-form-field appearance="fill" class="full-width" *ngIf="!isLoginMode">
+          <mat-label>Nome</mat-label>
+          <input matInput type="text" formControlName="name" required>
+          <mat-icon matPrefix>person</mat-icon>
+          <mat-error *ngIf="name?.hasError('required') && name?.touched">
+            Nome é obrigatório
+          </mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="fill" class="full-width">
+          <mat-label>Email</mat-label>
+          <input matInput type="email" formControlName="email" required>
+          <mat-icon matPrefix>email</mat-icon>
+          <mat-error *ngIf="email?.hasError('required') && email?.touched">
+            Email é obrigatório
+          </mat-error>
+          <mat-error *ngIf="email?.hasError('email') && email?.touched">
+            Por favor, insira um email válido
+          </mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="fill" class="full-width">
+          <mat-label>Senha</mat-label>
+          <input matInput [type]="hidePassword ? 'password' : 'text'" formControlName="password" required>
+          <mat-icon matPrefix>lock</mat-icon>
+          <button mat-icon-button matSuffix (click)="hidePassword = !hidePassword" type="button" [attr.aria-label]="'Ocultar senha'">
+            <mat-icon>{{ hidePassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+          </button>
+          <mat-error *ngIf="password?.hasError('required') && password?.touched">
+            Senha é obrigatória
+          </mat-error>
+          <mat-error *ngIf="password?.hasError('minlength') && password?.touched">
+            A senha deve ter pelo menos 6 caracteres
+          </mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="fill" class="full-width" *ngIf="!isLoginMode">
+          <mat-label>Confirmar Senha</mat-label>
+          <input matInput [type]="hideConfirmPassword ? 'password' : 'text'" formControlName="confirmPassword" required>
+          <mat-icon matPrefix>lock</mat-icon>
+          <button mat-icon-button matSuffix (click)="hideConfirmPassword = !hideConfirmPassword" type="button" [attr.aria-label]="'Ocultar senha'">
+            <mat-icon>{{ hideConfirmPassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+          </button>
+          <mat-error *ngIf="confirmPassword?.hasError('required') && confirmPassword?.touched">
+            Confirmação de senha é obrigatória
+          </mat-error>
+          <mat-error *ngIf="confirmPassword?.hasError('passwordMismatch') && confirmPassword?.touched">
+            As senhas não coincidem
+          </mat-error>
+        </mat-form-field>
+
+        <div *ngIf="errorMessage" class="error-message">
+          {{ errorMessage }}
+        </div>
+
+        <div *ngIf="successMessage" class="success-message">
+          {{ successMessage }}
+        </div>
+
+        <button mat-raised-button color="primary" type="submit" class="full-width" [disabled]="isLoading || currentForm.invalid">
+          <span *ngIf="!isLoading">{{ isLoginMode ? 'Entrar' : 'Registrar' }}</span>
+          <span *ngIf="isLoading">{{ isLoginMode ? 'Entrando...' : 'Registrando...' }}</span>
+        </button>
+
+        <div class="toggle-mode">
+          <button mat-button type="button" (click)="toggleMode()" class="full-width">
+            {{ isLoginMode ? 'Não tem uma conta? Registre-se' : 'Já tem uma conta? Faça login' }}
+          </button>
+        </div>
+      </form>
+    </mat-card-content>
+  </mat-card>
+</div>
+

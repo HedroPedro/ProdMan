@@ -265,15 +265,162 @@
 							}
 						],
 						"url": {
-							"raw": "{{base_url}}/users",
+							"raw": "{{base_url}}/users?include_deleted=false",
 							"host": [
 								"{{base_url}}"
 							],
 							"path": [
 								"users"
+							],
+							"query": [
+								{
+									"key": "include_deleted",
+									"value": "false",
+									"description": "Include soft-deleted users (true/false)"
+								},
+								{
+									"key": "created_after",
+									"value": "",
+									"description": "Filter users created after this date (YYYY-MM-DD)",
+									"disabled": true
+								},
+								{
+									"key": "created_before",
+									"value": "",
+									"description": "Filter users created before this date (YYYY-MM-DD)",
+									"disabled": true
+								},
+								{
+									"key": "created_last_days",
+									"value": "",
+									"description": "Filter users created in the last X days (integer)",
+									"disabled": true
+								}
 							]
 						},
-						"description": "Retrieves a list of all active (not-deleted) users."
+						"description": "Retrieves a list of users. Supports query parameters for filtering:\n- include_deleted: Include soft-deleted users (true/false)\n- created_after: Filter users created after this date (YYYY-MM-DD)\n- created_before: Filter users created before this date (YYYY-MM-DD)\n- created_last_days: Filter users created in the last X days (integer)"
+					},
+					"response": []
+				},
+				{
+					"name": "List Users - Include Deleted",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"// Check if token exists",
+									"if (!pm.collectionVariables.get('token')) {",
+									"    throw new Error('Token not found. Please login first.');",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Response contains users array\", function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('users');",
+									"    pm.expect(jsonData.users).to.be.an('array');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/users?include_deleted=true",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"users"
+							],
+							"query": [
+								{
+									"key": "include_deleted",
+									"value": "true",
+									"description": "Include soft-deleted users"
+								}
+							]
+						},
+						"description": "Retrieves all users including soft-deleted ones."
+					},
+					"response": []
+				},
+				{
+					"name": "List Users - Created Last 7 Days",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"// Check if token exists",
+									"if (!pm.collectionVariables.get('token')) {",
+									"    throw new Error('Token not found. Please login first.');",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Response contains users array\", function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('users');",
+									"    pm.expect(jsonData.users).to.be.an('array');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/users?created_last_days=7",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"users"
+							],
+							"query": [
+								{
+									"key": "created_last_days",
+									"value": "7",
+									"description": "Filter users created in the last 7 days"
+								}
+							]
+						},
+						"description": "Retrieves users created in the last 7 days."
 					},
 					"response": []
 				},
@@ -638,15 +785,178 @@
 							}
 						],
 						"url": {
-							"raw": "{{base_url}}/products",
+							"raw": "{{base_url}}/products?include_deleted=false&low_stock=false&out_of_stock=false",
 							"host": [
 								"{{base_url}}"
 							],
 							"path": [
 								"products"
+							],
+							"query": [
+								{
+									"key": "include_deleted",
+									"value": "false",
+									"description": "Include soft-deleted products (true/false)"
+								},
+								{
+									"key": "low_stock",
+									"value": "false",
+									"description": "Filter products with low stock (amount_available < 10)"
+								},
+								{
+									"key": "out_of_stock",
+									"value": "false",
+									"description": "Filter products with no stock (amount_available = 0)"
+								},
+								{
+									"key": "amount_available_lt",
+									"value": "",
+									"description": "Filter products with amount_available less than X",
+									"disabled": true
+								},
+								{
+									"key": "amount_available_gt",
+									"value": "",
+									"description": "Filter products with amount_available greater than X",
+									"disabled": true
+								},
+								{
+									"key": "value_min",
+									"value": "",
+									"description": "Filter products with value greater than or equal to X",
+									"disabled": true
+								},
+								{
+									"key": "value_max",
+									"value": "",
+									"description": "Filter products with value less than or equal to X",
+									"disabled": true
+								}
 							]
 						},
-						"description": "Retrieves a list of all active (not-deleted) products."
+						"description": "Retrieves a list of products. Supports query parameters for filtering:\n- include_deleted: Include soft-deleted products (true/false)\n- low_stock: Filter products with low stock, amount_available < 10 (true/false)\n- out_of_stock: Filter products with no stock, amount_available = 0 (true/false)\n- amount_available_lt: Filter products with amount_available less than X\n- amount_available_gt: Filter products with amount_available greater than X\n- value_min: Filter products with value >= X\n- value_max: Filter products with value <= X"
+					},
+					"response": []
+				},
+				{
+					"name": "List Products - Low Stock",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"// Check if token exists",
+									"if (!pm.collectionVariables.get('token')) {",
+									"    throw new Error('Token not found. Please login first.');",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Response contains products array\", function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('products');",
+									"    pm.expect(jsonData.products).to.be.an('array');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/products?low_stock=true",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"products"
+							],
+							"query": [
+								{
+									"key": "low_stock",
+									"value": "true",
+									"description": "Filter products with low stock (amount_available < 10)"
+								}
+							]
+						},
+						"description": "Retrieves products with low stock (amount_available < 10)."
+					},
+					"response": []
+				},
+				{
+					"name": "List Products - Include Deleted",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"// Check if token exists",
+									"if (!pm.collectionVariables.get('token')) {",
+									"    throw new Error('Token not found. Please login first.');",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Response contains products array\", function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('products');",
+									"    pm.expect(jsonData.products).to.be.an('array');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/products?include_deleted=true",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"products"
+							],
+							"query": [
+								{
+									"key": "include_deleted",
+									"value": "true",
+									"description": "Include soft-deleted products"
+								}
+							]
+						},
+						"description": "Retrieves all products including soft-deleted ones."
 					},
 					"response": []
 				},
@@ -1032,6 +1342,90 @@
 				}
 			],
 			"description": "Product management endpoints (protected - require authentication)"
+		},
+		{
+			"name": "Dashboard",
+			"item": [
+				{
+					"name": "Get Dashboard Statistics",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"// Check if token exists",
+									"if (!pm.collectionVariables.get('token')) {",
+									"    throw new Error('Token not found. Please login first.');",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Response time is less than 500ms\", function () {",
+									"    pm.expect(pm.response.responseTime).to.be.below(500);",
+									"});",
+									"",
+									"pm.test(\"Response contains products statistics\", function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('products');",
+									"    pm.expect(jsonData.products).to.be.an('object');",
+									"    pm.expect(jsonData.products).to.have.property('total');",
+									"    pm.expect(jsonData.products).to.have.property('total_units');",
+									"    pm.expect(jsonData.products).to.have.property('total_value');",
+									"    pm.expect(jsonData.products).to.have.property('average_price');",
+									"    pm.expect(jsonData.products).to.have.property('low_stock_count');",
+									"    pm.expect(jsonData.products).to.have.property('low_stock_products');",
+									"});",
+									"",
+									"pm.test(\"Response contains users statistics\", function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('users');",
+									"    pm.expect(jsonData.users).to.be.an('object');",
+									"    pm.expect(jsonData.users).to.have.property('total');",
+									"    pm.expect(jsonData.users).to.have.property('created_last_7_days');",
+									"    pm.expect(jsonData.users).to.have.property('created_last_30_days');",
+									"});",
+									"",
+									"pm.test(\"Response is valid JSON\", function () {",
+									"    pm.response.to.be.json;",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/dashboard/stats",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"dashboard",
+								"stats"
+							]
+						},
+						"description": "Retrieves dashboard statistics including product metrics (total, units, value, low stock products) and user metrics (total, recently created)."
+					},
+					"response": []
+				}
+			],
+			"description": "Dashboard statistics endpoint (protected - requires authentication)"
 		},
 		{
 			"name": "Health Check",
