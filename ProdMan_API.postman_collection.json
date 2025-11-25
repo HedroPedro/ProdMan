@@ -1034,6 +1034,90 @@
 			"description": "Product management endpoints (protected - require authentication)"
 		},
 		{
+			"name": "Dashboard",
+			"item": [
+				{
+					"name": "Get Dashboard Statistics",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"// Check if token exists",
+									"if (!pm.collectionVariables.get('token')) {",
+									"    throw new Error('Token not found. Please login first.');",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Response time is less than 500ms\", function () {",
+									"    pm.expect(pm.response.responseTime).to.be.below(500);",
+									"});",
+									"",
+									"pm.test(\"Response contains products statistics\", function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('products');",
+									"    pm.expect(jsonData.products).to.be.an('object');",
+									"    pm.expect(jsonData.products).to.have.property('total');",
+									"    pm.expect(jsonData.products).to.have.property('total_units');",
+									"    pm.expect(jsonData.products).to.have.property('total_value');",
+									"    pm.expect(jsonData.products).to.have.property('average_price');",
+									"    pm.expect(jsonData.products).to.have.property('low_stock_count');",
+									"    pm.expect(jsonData.products).to.have.property('low_stock_products');",
+									"});",
+									"",
+									"pm.test(\"Response contains users statistics\", function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('users');",
+									"    pm.expect(jsonData.users).to.be.an('object');",
+									"    pm.expect(jsonData.users).to.have.property('total');",
+									"    pm.expect(jsonData.users).to.have.property('created_last_7_days');",
+									"    pm.expect(jsonData.users).to.have.property('created_last_30_days');",
+									"});",
+									"",
+									"pm.test(\"Response is valid JSON\", function () {",
+									"    pm.response.to.be.json;",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/dashboard/stats",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"dashboard",
+								"stats"
+							]
+						},
+						"description": "Retrieves dashboard statistics including product metrics (total, units, value, low stock products) and user metrics (total, recently created)."
+					},
+					"response": []
+				}
+			],
+			"description": "Dashboard statistics endpoint (protected - requires authentication)"
+		},
+		{
 			"name": "Health Check",
 			"item": [
 				{
