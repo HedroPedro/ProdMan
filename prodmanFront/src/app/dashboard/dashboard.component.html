@@ -1,5 +1,185 @@
 <div class="dashboard-content">
   <h1>Dashboard</h1>
-  <p>Conteúdo do dashboard será implementado aqui.</p>
-</div>
 
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="loading-container">
+    <mat-spinner></mat-spinner>
+    <p>Carregando estatísticas...</p>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="error && !isLoading" class="error-container">
+    <mat-card class="error-card">
+      <mat-card-content>
+        <mat-icon color="warn">error</mat-icon>
+        <p>{{ error }}</p>
+        <button mat-raised-button color="primary" (click)="loadStats()">Tentar Novamente</button>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <!-- Dashboard Stats -->
+  <div *ngIf="stats && !isLoading" class="stats-grid">
+    <!-- Products Stats -->
+    <mat-card class="stat-card">
+      <mat-card-header>
+        <mat-card-title>
+          <mat-icon>inventory</mat-icon>
+          Total de Produtos
+        </mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="stat-value">{{ formatNumber(stats.products.total) }}</div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="stat-card">
+      <mat-card-header>
+        <mat-card-title>
+          <mat-icon>shopping_cart</mat-icon>
+          Total de Unidades
+        </mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="stat-value">{{ formatNumber(stats.products.total_units) }}</div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="stat-card">
+      <mat-card-header>
+        <mat-card-title>
+          <mat-icon>attach_money</mat-icon>
+          Valor Total do Estoque
+        </mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="stat-value">{{ formatCurrency(stats.products.total_value) }}</div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="stat-card">
+      <mat-card-header>
+        <mat-card-title>
+          <mat-icon>trending_up</mat-icon>
+          Preço Médio
+        </mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="stat-value">{{ formatCurrency(stats.products.average_price) }}</div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="stat-card">
+      <mat-card-header>
+        <mat-card-title>
+          <mat-icon>warning</mat-icon>
+          Produtos com Estoque Baixo
+        </mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="stat-value">{{ formatNumber(stats.products.low_stock_count) }}</div>
+        <div class="stat-subvalue">(produtos com estoque menor que 10)</div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="stat-card">
+      <mat-card-header>
+        <mat-card-title>
+          <mat-icon>cancel</mat-icon>
+          Produtos Sem Estoque
+        </mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="stat-value">{{ formatNumber(stats.products.out_of_stock_count) }}</div>
+        <div class="stat-subvalue">(produtos com estoque igual a 0)</div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="stat-card" *ngIf="stats.products.most_expensive">
+      <mat-card-header>
+        <mat-card-title>
+          <mat-icon>arrow_upward</mat-icon>
+          Produto Mais Caro
+        </mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="stat-value">{{ stats.products.most_expensive.name }}</div>
+        <div class="stat-subvalue">{{ formatCurrency(stats.products.most_expensive.value) }}</div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="stat-card" *ngIf="stats.products.cheapest">
+      <mat-card-header>
+        <mat-card-title>
+          <mat-icon>arrow_downward</mat-icon>
+          Produto Mais Barato
+        </mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="stat-value">{{ stats.products.cheapest.name }}</div>
+        <div class="stat-subvalue">{{ formatCurrency(stats.products.cheapest.value) }}</div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Low Stock Products List -->
+    <mat-card class="stat-card full-width" *ngIf="stats.products.low_stock_count > 0">
+      <mat-card-header>
+        <mat-card-title>
+          <mat-icon>warning</mat-icon>
+          Produtos com Estoque Baixo
+        </mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <mat-list class="low-stock-list" *ngIf="stats.products.low_stock_products.length > 0">
+          <mat-list-item *ngFor="let product of stats.products.low_stock_products">
+            <mat-icon matListItemIcon color="warn">warning</mat-icon>
+            <div matListItemTitle>{{ product.name }}</div>
+            <div matListItemLine>Quantidade: {{ formatNumber(product.amount_available) }}</div>
+          </mat-list-item>
+        </mat-list>
+        <p *ngIf="stats.products.low_stock_products.length === 0" class="no-items">
+          Nenhum produto com estoque baixo
+        </p>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Users Stats -->
+    <div class="users-stats-grid">
+      <mat-card class="stat-card">
+        <mat-card-header>
+          <mat-card-title>
+            <mat-icon>people</mat-icon>
+            Total de Usuários
+          </mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="stat-value">{{ formatNumber(stats.users.total) }}</div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="stat-card">
+        <mat-card-header>
+          <mat-card-title>
+            <mat-icon>person_add</mat-icon>
+            Usuários Criados (7 dias)
+          </mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="stat-value">{{ formatNumber(stats.users.created_last_7_days) }}</div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="stat-card">
+        <mat-card-header>
+          <mat-card-title>
+            <mat-icon>group_add</mat-icon>
+            Usuários Criados (30 dias)
+          </mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="stat-value">{{ formatNumber(stats.users.created_last_30_days) }}</div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+  </div>
+</div>
