@@ -68,7 +68,7 @@ export class UsersService {
   }
 
   createUser(user: CreateUserRequest): Observable<{ message: string }> {
-    return this.http.post<{ message: string }>(`${this.apiUrl}/users`, user);
+    return this.http.post<{ message: string }>(`${this.apiUrl}/auth/signin`, user);
   }
 
   updateUser(id: number, user: UpdateUserRequest): Observable<{ user: User }> {
