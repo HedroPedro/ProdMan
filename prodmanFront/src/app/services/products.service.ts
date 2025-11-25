@@ -30,12 +30,14 @@ export interface ProductQueryParams {
 
 export interface CreateProductRequest {
   name: string;
+  description?: string;
   value: number;
   amount_available: number;
 }
 
 export interface UpdateProductRequest {
   name?: string;
+  description?: string;
   value?: number;
   amount_available?: number;
 }

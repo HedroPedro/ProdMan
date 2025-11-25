@@ -16,11 +16,11 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatExpansionModule } from '@angular/material/expansion';
-import { MatDialogModule, MatDialog, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { MatDialogModule, MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBarModule, MatSnackBar } from '@angular/material/snack-bar';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { FormsModule, ReactiveFormsModule, FormControl } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule, FormControl, FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { ProductsService, Product, ProductResponse, ProductQueryParams } from '../services/products.service';
 
 @Component({
@@ -358,8 +358,16 @@ export class ProductsComponent implements OnInit, AfterViewInit {
   }
 
   editProduct(product: Product): void {
-    // Navigate to edit page (to be implemented)
-    this.router.navigate(['/products', product.id, 'edit']);
+    const dialogRef = this.dialog.open(ProductFormDialogComponent, {
+      width: '500px',
+      data: { product: product }
+    });
+
+    dialogRef.afterClosed().subscribe((result: Product | null) => {
+      if (result) {
+        this.loadProducts();
+      }
+    });
   }
 
   deleteProduct(product: Product): void {
@@ -433,7 +441,16 @@ export class ProductsComponent implements OnInit, AfterViewInit {
   }
 
   createProduct(): void {
-    this.router.navigate(['/products/new']);
+    const dialogRef = this.dialog.open(ProductFormDialogComponent, {
+      width: '500px',
+      data: { product: null }
+    });
+
+    dialogRef.afterClosed().subscribe((result: Product | null) => {
+      if (result) {
+        this.loadProducts();
+      }
+    });
   }
 
   onDeletedPanelOpened(): void {
@@ -629,5 +646,168 @@ export class ProductFiltersDialogComponent {
       valueMax: null
     };
     // Note: URL will be updated when user clicks "Aplicar"
+  }
+}
+
+// Product Form Dialog Component
+@Component({
+  selector: 'app-product-form-dialog',
+  template: `
+    <h2 mat-dialog-title>{{ isEditing ? 'Editar Produto' : 'Novo Produto' }}</h2>
+    <mat-dialog-content>
+      <form [formGroup]="productForm" (ngSubmit)="onSubmit()">
+        <mat-form-field appearance="fill" class="full-width">
+          <mat-label>Nome *</mat-label>
+          <input matInput formControlName="name" placeholder="Nome do produto">
+          <mat-error *ngIf="productForm.get('name')?.hasError('required')">
+            Nome é obrigatório
+          </mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="fill" class="full-width">
+          <mat-label>Descrição</mat-label>
+          <textarea matInput formControlName="description" placeholder="Descrição do produto" rows="4"></textarea>
+        </mat-form-field>
+
+        <mat-form-field appearance="fill" class="full-width">
+          <mat-label>Valor (R$) *</mat-label>
+          <input matInput type="number" formControlName="value" placeholder="0.00" step="0.01" min="0.01">
+          <mat-error *ngIf="productForm.get('value')?.hasError('required')">
+            Valor é obrigatório
+          </mat-error>
+          <mat-error *ngIf="productForm.get('value')?.hasError('min')">
+            Valor deve ser maior que zero
+          </mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="fill" class="full-width">
+          <mat-label>Quantidade *</mat-label>
+          <input matInput type="number" formControlName="amount_available" placeholder="0" min="0">
+          <mat-error *ngIf="productForm.get('amount_available')?.hasError('required')">
+            Quantidade é obrigatória
+          </mat-error>
+          <mat-error *ngIf="productForm.get('amount_available')?.hasError('min')">
+            Quantidade não pode ser negativa
+          </mat-error>
+        </mat-form-field>
+      </form>
+    </mat-dialog-content>
+    <mat-dialog-actions align="end">
+      <button mat-button [mat-dialog-close]="null" [disabled]="isSaving">Cancelar</button>
+      <button mat-raised-button color="primary" (click)="onSubmit()" [disabled]="isSaving || productForm.invalid">
+        <mat-spinner *ngIf="isSaving" diameter="20" class="inline-spinner"></mat-spinner>
+        <span *ngIf="!isSaving">{{ isEditing ? 'Salvar' : 'Criar' }}</span>
+        <span *ngIf="isSaving">{{ isEditing ? 'Salvando...' : 'Criando...' }}</span>
+      </button>
+    </mat-dialog-actions>
+  `,
+  styles: [`
+    .full-width {
+      width: 100%;
+      margin-bottom: 16px;
+    }
+
+    .full-width:last-of-type {
+      margin-bottom: 0;
+    }
+
+    mat-dialog-content {
+      padding: 24px;
+      min-width: 400px;
+    }
+
+    .inline-spinner {
+      display: inline-block;
+      margin-right: 8px;
+    }
+
+    mat-form-field {
+      display: block;
+    }
+  `],
+  standalone: true,
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    MatDialogModule,
+    MatButtonModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatProgressSpinnerModule
+  ]
+})
+export class ProductFormDialogComponent {
+  productForm: FormGroup;
+  isEditing = false;
+  isSaving = false;
+  private readonly productsService = inject(ProductsService);
+  private readonly dialogRef = inject(MatDialogRef<ProductFormDialogComponent>);
+  private readonly snackBar = inject(MatSnackBar);
+  private readonly fb = inject(FormBuilder);
+
+  constructor(@Inject(MAT_DIALOG_DATA) public data: { product: Product | null }) {
+    this.isEditing = !!data.product;
+
+    this.productForm = this.fb.group({
+      name: [data.product?.name || '', [Validators.required]],
+      description: [data.product?.description || ''],
+      value: [data.product?.value || null, [Validators.required, Validators.min(0.01)]],
+      amount_available: [data.product?.amount_available || null, [Validators.required, Validators.min(0)]]
+    });
+  }
+
+  onSubmit(): void {
+    if (this.productForm.invalid || this.isSaving) {
+      return;
+    }
+
+    this.isSaving = true;
+    const formValue = this.productForm.value;
+
+    if (this.isEditing && this.data.product) {
+      // Update existing product
+      this.productsService.updateProduct(this.data.product.id, {
+        name: formValue.name,
+        description: formValue.description || undefined,
+        value: formValue.value,
+        amount_available: formValue.amount_available
+      }).subscribe({
+        next: (response: { product: Product }) => {
+          this.snackBar.open('Produto atualizado com sucesso', 'Fechar', {
+            duration: 3000
+          });
+          this.dialogRef.close(response.product);
+        },
+        error: (err: any) => {
+          console.error('Error updating product:', err);
+          this.snackBar.open('Erro ao atualizar produto', 'Fechar', {
+            duration: 3000
+          });
+          this.isSaving = false;
+        }
+      });
+    } else {
+      // Create new product
+      this.productsService.createProduct({
+        name: formValue.name,
+        description: formValue.description || undefined,
+        value: formValue.value,
+        amount_available: formValue.amount_available
+      }).subscribe({
+        next: () => {
+          this.snackBar.open('Produto criado com sucesso', 'Fechar', {
+            duration: 3000
+          });
+          this.dialogRef.close({ id: 0 } as Product); // Return a dummy product to trigger reload
+        },
+        error: (err: any) => {
+          console.error('Error creating product:', err);
+          this.snackBar.open('Erro ao criar produto', 'Fechar', {
+            duration: 3000
+          });
+          this.isSaving = false;
+        }
+      });
+    }
   }
 }
