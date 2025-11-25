@@ -1,0 +1,31 @@
+pt-BR:
+  activerecord:
+    errors:
+      models:
+        user:
+          attributes:
+            name:
+              blank: "não pode ficar em branco"
+            email_address:
+              blank: "não pode ficar em branco"
+              taken: "já está em uso"
+            password:
+              too_short: "é muito curta (mínimo de %{count} caracteres)"
+        product:
+          attributes:
+            name:
+              blank: "não pode ficar em branco"
+              taken: "já está em uso"
+            value:
+              blank: "não pode ficar em branco"
+            amount_available:
+              blank: "não pode ficar em branco"
+    attributes:
+      user:
+        name: "Nome"
+        email_address: "Email"
+        password: "Senha"
+      product:
+        name: "Nome"
+        value: "Valor"
+        amount_available: "Quantidade disponível"

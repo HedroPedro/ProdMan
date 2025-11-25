@@ -38,7 +38,7 @@ module Authentication
     end
 
     def request_authentication
-      render json: { error: "Unauthorized. Token invalid or not provided"}, status: :unauthorized
+      render json: { error: "Não autorizado. Token inválido ou não fornecido"}, status: :unauthorized
     end
 
 

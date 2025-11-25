@@ -7,9 +7,9 @@ class ProductsController < ApplicationController
   def create
     @product = Product.new(product_params)
     if @product.save
-      render json: { message: "Product was successfully created" }, status: :created
+      render json: { message: "Produto criado com sucesso" }, status: :created
     else
-      render json: { message: "Issue saving product", errors: @product.errors.full_messages }, status: :unprocessable_entity
+      render json: { message: "Erro ao salvar produto", errors: @product.errors.full_messages }, status: :unprocessable_entity
     end
   end
 
@@ -29,7 +29,7 @@ class ProductsController < ApplicationController
     if @product.update(product_params)
       render json: { product: @product }, status: :ok
     else  
-      render json: { message: "Issue updating product", errors: @product.errors.full_messages }, status: :unprocessable_entity
+      render json: { message: "Erro ao atualizar produto", errors: @product.errors.full_messages }, status: :unprocessable_entity
     end
   end
 
@@ -43,16 +43,16 @@ class ProductsController < ApplicationController
   def restore
     @product = Product.unscoped.find(params[:id])
     if @product.update(deleted_at: nil)
-      render json: { message: "Product was successfully restored", product: @product }
+      render json: { message: "Produto restaurado com sucesso", product: @product }
     else
-      render json: { message: "Issue restoring product", errors: @product.errors.full_messages }, status: :bad_request
+      render json: { message: "Erro ao restaurar produto", errors: @product.errors.full_messages }, status: :bad_request
     end
   end
 
   private
 
   def record_not_found(error)
-    render json: { error: "Product with ID #{params[:id]} not found" }, status: :not_found
+    render json: { error: "Produto com ID #{params[:id]} não encontrado" }, status: :not_found
   end
 
   def set_product
