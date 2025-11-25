@@ -88,7 +88,15 @@ export class LoginComponent {
         })
       ).subscribe({
         next: () => {
-          this.router.navigate(['/home']);
+          // Use setTimeout to ensure token is saved to localStorage before navigation
+          // This is especially important for SSR or when localStorage operations might be async
+          setTimeout(() => {
+            if (this.authService.isAuthenticated()) {
+              this.router.navigate(['/dashboard']);
+            } else {
+              this.errorMessage = 'Erro ao salvar autenticação. Tente novamente.';
+            }
+          }, 0);
         },
         error: (error: any) => {
           if (error.error?.message) {
