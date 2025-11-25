@@ -7,6 +7,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
+import { MatSnackBarModule, MatSnackBar } from '@angular/material/snack-bar';
 import { finalize } from 'rxjs';
 import { AuthService } from '../services/auth.service';
 
@@ -20,7 +21,8 @@ import { AuthService } from '../services/auth.service';
     MatFormFieldModule,
     MatInputModule,
     MatButtonModule,
-    MatIconModule
+    MatIconModule,
+    MatSnackBarModule
   ],
   templateUrl: './login.component.html',
   styleUrl: './login.component.css'
@@ -29,6 +31,7 @@ export class LoginComponent {
   private readonly fb = inject(FormBuilder);
   private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
+  private readonly snackBar = inject(MatSnackBar);
 
   loginForm: FormGroup;
   registerForm: FormGroup;
@@ -99,13 +102,23 @@ export class LoginComponent {
           }, 0);
         },
         error: (error: any) => {
-          if (error.error?.message) {
-            this.errorMessage = error.error.message;
+          let errorMsg = '';
+          
+          // Check for errors array first (from backend validation)
+          if (error.error?.errors && Array.isArray(error.error.errors) && error.error.errors.length > 0) {
+            errorMsg = error.error.errors.join(', ');
           } else if (error.error?.error) {
-            this.errorMessage = error.error.error;
+            errorMsg = error.error.error;
+          } else if (error.error?.message) {
+            errorMsg = error.error.message;
           } else {
-            this.errorMessage = 'Ocorreu um erro ao fazer login. Tente novamente.';
+            errorMsg = 'Ocorreu um erro ao fazer login. Tente novamente.';
           }
+          
+          this.errorMessage = errorMsg;
+          this.snackBar.open(errorMsg, 'Fechar', {
+            duration: 5000
+          });
         }
       });
     } else {
@@ -135,13 +148,23 @@ export class LoginComponent {
           }, 2000);
         },
         error: (error: any) => {
-          if (error.error?.message) {
-            this.errorMessage = error.error.message;
+          let errorMsg = '';
+          
+          // Check for errors array first (from backend validation)
+          if (error.error?.errors && Array.isArray(error.error.errors) && error.error.errors.length > 0) {
+            errorMsg = error.error.errors.join(', ');
           } else if (error.error?.error) {
-            this.errorMessage = error.error.error;
+            errorMsg = error.error.error;
+          } else if (error.error?.message) {
+            errorMsg = error.error.message;
           } else {
-            this.errorMessage = 'Ocorreu um erro ao criar a conta. Tente novamente.';
+            errorMsg = 'Ocorreu um erro ao criar a conta. Tente novamente.';
           }
+          
+          this.errorMessage = errorMsg;
+          this.snackBar.open(errorMsg, 'Fechar', {
+            duration: 5000
+          });
         }
       });
     } else {
