@@ -4,7 +4,6 @@ import { MainLayoutComponent } from './layouts/main-layout.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { ProductsComponent } from './products/products.component';
 import { UsersComponent } from './users/users.component';
-import { MyProfileComponent } from './my-profile/my-profile.component';
 import { authGuard } from './guards/auth.guard';
 
 export const routes: Routes = [
@@ -28,10 +27,6 @@ export const routes: Routes = [
       {
         path: 'users',
         component: UsersComponent
-      },
-      {
-        path: 'my-profile',
-        component: MyProfileComponent
       },
       {
         path: '',

@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
@@ -6,6 +6,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatListModule } from '@angular/material/list';
 import { MatButtonModule } from '@angular/material/button';
 import { DashboardService, DashboardStats } from '../services/dashboard.service';
+import { finalize } from 'rxjs';
 
 @Component({
   selector: 'app-dashboard',
@@ -23,9 +24,10 @@ import { DashboardService, DashboardStats } from '../services/dashboard.service'
 })
 export class DashboardComponent implements OnInit {
   private readonly dashboardService = inject(DashboardService);
+  private readonly cdr = inject(ChangeDetectorRef);
 
   stats: DashboardStats | null = null;
-  isLoading = false;
+  isLoading = true;
   error: string | null = null;
 
   ngOnInit(): void {
@@ -35,16 +37,20 @@ export class DashboardComponent implements OnInit {
   loadStats(): void {
     this.isLoading = true;
     this.error = null;
+    this.stats = null;
 
-    this.dashboardService.getStats().subscribe({
+    this.dashboardService.getStats().pipe(
+      finalize(() => {
+        this.isLoading = false;
+        this.cdr.detectChanges();
+      })
+    ).subscribe({
       next: (data: DashboardStats) => {
         this.stats = data;
-        this.isLoading = false;
       },
       error: (err: any) => {
         console.error('Error loading dashboard stats:', err);
         this.error = 'Erro ao carregar estatísticas. Tente novamente.';
-        this.isLoading = false;
       }
     });
   }
