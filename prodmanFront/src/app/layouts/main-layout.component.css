@@ -1,0 +1,66 @@
+.sidenav-container {
+  height: 100vh;
+}
+
+.sidenav {
+  width: 250px;
+  background-color: var(--mat-sys-surface-container-high);
+  box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
+}
+
+.sidenav, .mat-toolbar {
+  background: var(--mat-sys-surface-container-high);
+  color: var(--mat-sys-on-surface);
+  border-bottom: 1px solid var(--mat-sys-outline-variant);
+}
+
+.mat-toolbar.mat-primary {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+.spacer {
+  flex: 1 1 auto;
+}
+
+.user-info {
+  margin-right: 8px;
+  font-size: 14px;
+}
+
+.content {
+  padding: 16px;
+  background-color: var(--mat-sys-surface);
+}
+
+.sidebar-menu {
+  padding: 8px 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebar-menu button[mat-menu-item] {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 0 16px;
+  text-align: left;
+  border-radius: 0;
+  justify-content: flex-start;
+  min-height: 48px;
+}
+
+.sidebar-menu button[mat-menu-item] mat-icon {
+  margin-right: 0;
+}
+
+.sidebar-menu button[mat-menu-item].active {
+  background-color: rgba(0, 0, 0, 0.04);
+}
+
+.sidebar-menu button[mat-menu-item]:hover {
+  background-color: rgba(0, 0, 0, 0.08);
+}
+
