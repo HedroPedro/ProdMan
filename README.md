@@ -1,18 +1,125 @@
 # ProdMan
 
-A simple stock manager done in Vue+Angular and Ruby On Rails
+A simple stock manager built with Angular and Ruby on Rails
 
 ## 📖 About The Project
 
-ProdMan is a complete backend API for a simple stock management application. It provides services for managing users, products, authentication, and inventory.
+ProdMan is a complete stock management application with a modern Angular frontend and a Ruby on Rails backend API. It provides a full-featured interface for managing users, products, authentication, and inventory with real-time statistics and advanced filtering capabilities.
 
-This backend is built with **Ruby on Rails 8.1** as a stateless, token-based (JWT) API. It uses a **MySQL 9.5** database and is fully containerized with **Docker** for easy setup and reliable deployment.
+### Architecture
 
-## 🚀 Frontend
+- **Frontend:** Angular 21 with Angular Material UI
+- **Backend:** Ruby on Rails 8.1 as a stateless, token-based (JWT) API
+- **Database:** MySQL 9.5
+- **Containerization:** Docker & Docker Compose for both frontend and backend
 
-*WRITE ABOUT FRONTEND*
+## 🚀 Getting Started
 
------
+Both frontend and backend are fully containerized with Docker Compose, making setup and development straightforward.
+
+**Prerequisites:**
+
+- [Docker](https://www.docker.com/products/docker-desktop/)
+- [Docker Compose](https://docs.docker.com/compose/)
+
+### Quick Start
+
+1. **Clone the repository:**
+
+   ```sh
+   git clone https://github.com/HedroPedro/ProdMan.git
+   cd ProdMan
+   ```
+
+2. **Start the Backend:**
+
+   ```sh
+   cd prodmanAPI
+   docker-compose up --build
+   ```
+
+   The API will be available at: **`http://localhost:8080`**
+
+3. **Start the Frontend (in a new terminal):**
+
+   ```sh
+   cd prodmanFront
+   docker-compose up --build
+   ```
+
+   The frontend will be available at: **`http://localhost:4200`**
+
+4. **Access the application:**
+
+   Open your browser and navigate to `http://localhost:4200`
+
+   - Create a new account or login with existing credentials
+   - Start managing your products and users!
+
+---
+
+## 🎨 Frontend (Angular)
+
+### Tech Stack
+
+- **Framework:** Angular 21
+- **UI Library:** Angular Material
+- **Language:** TypeScript
+- **Build Tool:** Angular CLI
+- **Containerization:** Docker & Docker Compose
+
+### ✨ Features
+
+- **Modern UI:** Material Design components with responsive layout
+- **Authentication:** Login and registration with JWT token management
+- **Dashboard:** Real-time statistics for products and users
+- **Product Management:** 
+  - Full CRUD operations
+  - Advanced filtering (stock levels, price ranges, dates)
+  - Search functionality
+  - Soft delete with restore capability
+- **User Management:**
+  - Full CRUD operations
+  - User filtering by creation date
+  - Soft delete with restore capability
+- **Profile Management:** Edit your own profile from the topbar menu
+- **URL Query Parameters:** Shareable filtered views via URL
+
+### 🚀 Frontend Development Setup
+
+1. **Navigate to frontend directory:**
+
+   ```sh
+   cd prodmanFront
+   ```
+
+2. **Build and start with Docker:**
+
+   ```sh
+   docker-compose up --build
+   ```
+
+3. **Access the application:**
+
+   The frontend will be running at: **`http://localhost:4200`**
+
+   **Note:** The frontend is configured to connect to the backend at `http://localhost:8080`. Make sure the backend is running first.
+
+4. **Development features:**
+
+   - Hot-reload enabled (changes are reflected automatically)
+   - File watching with polling (works in Docker)
+   - Development mode with source maps
+
+5. **To stop the frontend:**
+
+   Press `Ctrl+C` or run:
+
+   ```sh
+   docker-compose down
+   ```
+
+---
 
 ## 🛠️ Backend (Rails API)
 
@@ -32,36 +139,23 @@ This backend is built with **Ruby on Rails 8.1** as a stateless, token-based (JW
   * **Soft Deletes:** Users and products are never truly deleted. They are marked with a `deleted_at` timestamp and can be restored, preserving data integrity.
   * **Error Handling:** Clear `404 Not Found` and `422/400` validation error messages.
 
-### 🚀 Getting Started (Docker)
+### 🚀 Backend Development Setup
 
-The entire application is containerized with Docker Compose. This is the recommended way to run the project in a development environment.
-
-**Prerequisites:**
-
-  * [Docker](https://www.docker.com/products/docker-desktop/)
-  * [Docker Compose](https://docs.docker.com/compose/)
-
-**Installation:**
-
-1.  **Clone the repository:**
+1.  **Navigate to backend directory:**
 
     ```sh
-    git clone https://github.com/HedroPedro/ProdMan.git
-    cd ProdMan/prodmanAPI
+    cd prodmanAPI
     ```
 
-2.  **Ensure all Docker files are present:**
-    You must have `Dockerfile`, `docker-compose.yml`, `entrypoint.sh`, and `.dockerignore` in the root of the project.
-
-3.  **Build the Docker images:**
+2.  **Build the Docker images:**
     This command builds the custom Ruby image, installing all system dependencies (like `libmariadb-dev`) and Ruby gems.
 
     ```sh
     docker-compose build
     ```
 
-4.  **Run the application:**
-    This command will start the Rails `web` container and the `db` (MySQL) container in the background. The `entrypoint.sh` script will automatically:
+3.  **Run the application:**
+    This command will start the Rails `web` container and the `db` (MySQL) container. The `entrypoint.sh` script will automatically:
 
       * Wait for the database to be ready.
       * Run any pending database migrations (`db:migrate`).
@@ -71,10 +165,10 @@ The entire application is containerized with Docker Compose. This is the recomme
     docker-compose up
     ```
 
-5.  **Access the API:**
+4.  **Access the API:**
     The API will be running and accessible at: **`http://localhost:8080`**
 
-6.  **To stop the application:**
+5.  **To stop the application:**
     Press `Ctrl+C` in the terminal where `docker-compose up` is running. To clean up the containers, run:
 
     ```sh
@@ -109,9 +203,69 @@ All protected routes require an `Authorization: Bearer <token>` header, which is
 
 | Method | Endpoint | Description |
 | :--- | :--- | :--- |
-| `GET` | `/products` | Lists all active (not-deleted) products. |
+| `GET` | `/products` | Lists all active (not-deleted) products. Supports query parameters: `include_deleted`, `low_stock`, `out_of_stock`, `amount_available_lt`, `amount_available_gt`, `value_min`, `value_max`. |
 | `POST` | `/products` | Creates a new product. |
 | `GET` | `/products/{id}` | Gets a single product by ID. |
 | `PATCH`| `/products/{id}` | Updates a product's details. |
 | `DELETE`| `/products/{id}` | **Soft deletes** a product (sets `deleted_at`). |
 | `PATCH` | `/products/{id}/restore`| Restores a soft-deleted product (sets `deleted_at` to `null`). |
+
+#### Dashboard (Protected)
+
+| Method | Endpoint | Description |
+| :--- | :--- | :--- |
+| `GET` | `/dashboard/stats` | Returns aggregated statistics for products and users (total counts, stock levels, creation dates, etc.). |
+
+#### Users (Protected - Query Parameters)
+
+The `/users` endpoint supports the following query parameters:
+
+- `include_deleted`: Include soft-deleted users (true/false)
+- `created_after`: Filter users created after this date (YYYY-MM-DD)
+- `created_before`: Filter users created before this date (YYYY-MM-DD)
+- `created_last_days`: Filter users created in the last X days (integer)
+
+#### Products (Protected - Query Parameters)
+
+The `/products` endpoint supports the following query parameters:
+
+- `include_deleted`: Include soft-deleted products (true/false)
+- `low_stock`: Filter products with stock less than 10 (true/false)
+- `out_of_stock`: Filter products with stock equal to 0 (true/false)
+- `amount_available_lt`: Filter products with stock less than this value (integer)
+- `amount_available_gt`: Filter products with stock greater than this value (integer)
+- `value_min`: Filter products with value greater than or equal to this (decimal)
+- `value_max`: Filter products with value less than or equal to this (decimal)
+
+---
+
+## 🌐 API Configuration
+
+### Environment Variables
+
+**Backend:**
+- `DATABASE_HOST`: Database host (default: `db`)
+- `DATABASE_USER`: Database user (default: `prodman_user`)
+- `DATABASE_PASSWORD`: Database password (default: `prodman_password`)
+- `DATABASE_NAME`: Database name (default: `prodman_api_development`)
+
+**Frontend:**
+- `NODE_ENV`: Node environment (default: `development`)
+- `CHOKIDAR_USEPOLLING`: Enable file watching in Docker (default: `true`)
+- `NG_CLI_ANALYTICS`: Disable Angular CLI analytics (default: `false`)
+
+### API Base URL
+
+The frontend is configured to connect to the backend at `http://localhost:8080`. This can be changed in:
+- `prodmanFront/src/environments/environment.ts` (development)
+- `prodmanFront/src/environments/environment.prod.ts` (production)
+
+---
+
+## 📝 Notes
+
+- All error messages are in Portuguese (pt-BR)
+- The application uses JWT tokens for authentication
+- Soft deletes are used for both users and products to preserve data integrity
+- The frontend supports URL query parameters for sharing filtered views
+- Both frontend and backend support hot-reload in development mode
